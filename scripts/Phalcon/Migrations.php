@@ -108,6 +108,7 @@ class Migrations
                 /** @var IncrementalVersion $versionItem */
                 $versionItem = VersionCollection::maximum($versionItems);
                 $versionItem = $versionItem->addMinor(1);
+
             }
         }
 
@@ -155,7 +156,7 @@ class Migrations
             print Color::info('Nothing to generate. You should create tables at first.') . PHP_EOL;
         }
 
-        exit(0);
+        //        exit(0);
     }
 
     /**
@@ -376,9 +377,9 @@ class Migrations
      */
     private static function connectionSetup($options)
     {
-        if (self::$_storage) {
-            return;
-        }
+        //        if (self::$_storage) {
+        //            return;
+        //        }
 
         if (isset($options['migrationsInDb']) && (bool)$options['migrationsInDb']) {
             /** @var Config $database */
@@ -446,7 +447,13 @@ class Migrations
                 chmod($path . '.phalcon', 0775);
             }
 
-            self::$_storage = $path . '.phalcon/migration-version';
+            $migrationFid = $path . '.phalcon/migration-version';
+
+            if (isset($options['isMultipleDatabases']) && $options['isMultipleDatabases']) {
+                $migrationFid .= '-'.$options['config']['database']->dbname;
+            }
+
+            self::$_storage = $migrationFid;
 
             if (!file_exists(self::$_storage)) {
                 touch(self::$_storage);
